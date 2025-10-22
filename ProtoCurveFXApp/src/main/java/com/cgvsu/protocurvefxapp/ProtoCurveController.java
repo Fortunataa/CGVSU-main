@@ -30,19 +30,43 @@ public class ProtoCurveController {
         });
     }
 
-
     private void handlePrimaryClick(GraphicsContext graphicsContext, MouseEvent event) {
         final Point2D clickPoint = new Point2D(event.getX(), event.getY());
-
-        final int POINT_RADIUS = 3;
-        graphicsContext.fillOval(
-                clickPoint.getX() - POINT_RADIUS, clickPoint.getY() - POINT_RADIUS,
-                2 * POINT_RADIUS, 2 * POINT_RADIUS);
-
-        if (points.size() > 0) {
-            final Point2D lastPoint = points.get(points.size() - 1);
-            graphicsContext.strokeLine(lastPoint.getX(), lastPoint.getY(), clickPoint.getX(), clickPoint.getY());
-        }
         points.add(clickPoint);
+        Point2D center = clickPoint;
+        drawSegment(graphicsContext, (int)center.getX(), (int)center.getY(), 100, 0, 90);
+    }
+
+    private void drawSegment(GraphicsContext graphicsContext, int x, int y, double r, double startAngle, double arcAngle) {
+        startAngle = startAngle % 360;
+        if (arcAngle > 360) {
+            arcAngle = 360;
+        }
+
+        if (arcAngle < -360) {
+            arcAngle = -360;
+        }
+
+        double endAngle = arcAngle + startAngle;
+
+        double beginX = x + r * Math.cos(Math.toRadians(startAngle));
+        double beginY = y + r * Math.sin(Math.toRadians(startAngle));
+        graphicsContext.strokeLine(x, y, beginX, beginY);
+
+        double endX = x + r * Math.cos(Math.toRadians(endAngle));
+        double endY = y + r * Math.sin(Math.toRadians(endAngle));
+        graphicsContext.strokeLine(x, y, endX, endY);
+
+        double prevX = beginX, prevY = beginY;
+        for (double angle = startAngle + 1; angle < endAngle; angle++) {
+            double rad = Math.toRadians(angle);
+            double currX = x + r * Math.cos(rad);
+            double currY = y + r * Math.sin(rad);
+
+            graphicsContext.strokeLine(prevX, prevY, currX, currY);
+            prevX = currX;
+            prevY = currY;
+        }
+        graphicsContext.strokeLine(prevX, prevY, endX, endY);
     }
 }
