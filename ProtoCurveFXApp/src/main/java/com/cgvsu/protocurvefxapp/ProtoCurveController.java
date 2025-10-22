@@ -34,7 +34,7 @@ public class ProtoCurveController {
         final Point2D clickPoint = new Point2D(event.getX(), event.getY());
         points.add(clickPoint);
         Point2D center = clickPoint;
-        drawSegment(graphicsContext, (int)center.getX(), (int)center.getY(), 100, 0, 90);
+        drawSegment(graphicsContext, (int)center.getX(), (int)center.getY(), 100, 135, 45);
     }
 
     private void drawSegment(GraphicsContext graphicsContext, int x, int y, double r, double startAngle, double arcAngle) {
@@ -47,21 +47,30 @@ public class ProtoCurveController {
             arcAngle = -360;
         }
 
+        double direction;
+        if (arcAngle >= 0){
+            direction = 1;
+        } else {
+            direction = -1;
+        }
+
         double endAngle = arcAngle + startAngle;
 
         double beginX = x + r * Math.cos(Math.toRadians(startAngle));
-        double beginY = y + r * Math.sin(Math.toRadians(startAngle));
+        double beginY = y - r * Math.sin(Math.toRadians(startAngle));
         graphicsContext.strokeLine(x, y, beginX, beginY);
 
         double endX = x + r * Math.cos(Math.toRadians(endAngle));
-        double endY = y + r * Math.sin(Math.toRadians(endAngle));
+        double endY = y - r * Math.sin(Math.toRadians(endAngle));
         graphicsContext.strokeLine(x, y, endX, endY);
 
+        int segment_length = (int) Math.abs(arcAngle);
         double prevX = beginX, prevY = beginY;
-        for (double angle = startAngle + 1; angle < endAngle; angle++) {
+        for (int i = 1; i < segment_length; i++) {
+            double angle = startAngle + i * direction;
             double rad = Math.toRadians(angle);
             double currX = x + r * Math.cos(rad);
-            double currY = y + r * Math.sin(rad);
+            double currY = y - r * Math.sin(rad);
 
             graphicsContext.strokeLine(prevX, prevY, currX, currY);
             prevX = currX;
