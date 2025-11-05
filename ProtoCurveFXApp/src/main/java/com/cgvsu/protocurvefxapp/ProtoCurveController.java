@@ -7,7 +7,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
+import java.awt.*;
 import java.util.ArrayList;
+import static javafx.scene.paint.Color.BLUE;
+import static javafx.scene.paint.Color.GREEN;
 
 public class ProtoCurveController {
 
@@ -34,48 +37,42 @@ public class ProtoCurveController {
         final Point2D clickPoint = new Point2D(event.getX(), event.getY());
         points.add(clickPoint);
         Point2D center = clickPoint;
-        drawSegment(graphicsContext, (int)center.getX(), (int)center.getY(), 100, 135, 45);
+        drawSegment(graphicsContext, center.getX(), center.getY(), 100, 0, 225);
     }
 
-    private void drawSegment(GraphicsContext graphicsContext, int x, int y, double r, double startAngle, double arcAngle) {
-        startAngle = startAngle % 360;
-        if (arcAngle > 360) {
-            arcAngle = 360;
-        }
-
-        if (arcAngle < -360) {
-            arcAngle = -360;
-        }
-
-        double direction;
-        if (arcAngle >= 0){
-            direction = 1;
-        } else {
-            direction = -1;
-        }
-
+    private void drawSegment(GraphicsContext graphicsContext, double x, double y, double r, double startAngle, double arcAngle) {
         double endAngle = arcAngle + startAngle;
+        double oa_x = r * Math.cos(Math.toRadians(startAngle));
+        double oa_y = r * Math.sin(Math.toRadians(startAngle));
+        double ob_x = r * Math.cos(Math.toRadians(endAngle));
+        double ob_y = r * Math.sin(Math.toRadians(endAngle));
 
-        double beginX = x + r * Math.cos(Math.toRadians(startAngle));
-        double beginY = y - r * Math.sin(Math.toRadians(startAngle));
-        graphicsContext.strokeLine(x, y, beginX, beginY);
+        double left = x - r;
+        double top = y - r;
+        double box = 2 * r;
 
-        double endX = x + r * Math.cos(Math.toRadians(endAngle));
-        double endY = y - r * Math.sin(Math.toRadians(endAngle));
-        graphicsContext.strokeLine(x, y, endX, endY);
+        for (double i = left; i < left + box; i++) {
+            for (double j = top; j < top + box; j++) {
+                double op_x = i - x;
+                double op_y = j - y;
 
-        int segment_length = (int) Math.abs(arcAngle);
-        double prevX = beginX, prevY = beginY;
-        for (int i = 1; i < segment_length; i++) {
-            double angle = startAngle + i * direction;
-            double rad = Math.toRadians(angle);
-            double currX = x + r * Math.cos(rad);
-            double currY = y - r * Math.sin(rad);
+                if (Math.pow((op_x), 2) + Math.pow((op_y), 2) <= Math.pow(r, 2)) {
+                    double new_vector_M = oa_x * op_y - oa_y * op_x;
+                    double new_vector_N = op_x * ob_y - op_y * ob_x;
 
-            graphicsContext.strokeLine(prevX, prevY, currX, currY);
-            prevX = currX;
-            prevY = currY;
+                    if (arcAngle > 0) {
+                        if (new_vector_M >= 0 && new_vector_N >= 0){
+                            graphicsContext.getPixelWriter().setColor((int) i, (int) j, BLUE);
+                        }
+                    } else {
+                        if (new_vector_M <= 0 && new_vector_N <= 0) {
+                            graphicsContext.getPixelWriter().setColor((int) i, (int) j, BLUE);
+                        }
+                    }
+
+                }
+            }
         }
-        graphicsContext.strokeLine(prevX, prevY, endX, endY);
     }
 }
+
