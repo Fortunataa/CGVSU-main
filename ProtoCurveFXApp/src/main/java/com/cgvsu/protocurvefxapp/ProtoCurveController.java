@@ -9,8 +9,8 @@ import javafx.scene.layout.AnchorPane;
 
 import java.awt.*;
 import java.util.ArrayList;
-import static javafx.scene.paint.Color.BLUE;
-import static javafx.scene.paint.Color.GREEN;
+import javafx.scene.paint.Color;
+
 
 public class ProtoCurveController {
 
@@ -37,11 +37,14 @@ public class ProtoCurveController {
         final Point2D clickPoint = new Point2D(event.getX(), event.getY());
         points.add(clickPoint);
         Point2D center = clickPoint;
-        drawSegment(graphicsContext, center.getX(), center.getY(), 100, 0, 225);
+        Color color = Color.rgb(216, 191, 216);
+        drawSegment(graphicsContext, center.getX(), center.getY(), 100, 100, 45, color);
     }
 
-    private void drawSegment(GraphicsContext graphicsContext, double x, double y, double r, double startAngle, double arcAngle) {
+    private void drawSegment(GraphicsContext graphicsContext, double x, double y, double r, double startAngle, double arcAngle, Color color) {
         double endAngle = arcAngle + startAngle;
+        boolean isFullCircle = arcAngle >= 360 || startAngle == endAngle;
+
         double oa_x = r * Math.cos(Math.toRadians(startAngle));
         double oa_y = r * Math.sin(Math.toRadians(startAngle));
         double ob_x = r * Math.cos(Math.toRadians(endAngle));
@@ -57,21 +60,24 @@ public class ProtoCurveController {
                 double op_y = j - y;
 
                 if (Math.pow((op_x), 2) + Math.pow((op_y), 2) <= Math.pow(r, 2)) {
-                    double new_vector_M = oa_x * op_y - oa_y * op_x;
-                    double new_vector_N = op_x * ob_y - op_y * ob_x;
-
-                    if (arcAngle > 0) {
-                        if (new_vector_M >= 0 && new_vector_N >= 0){
-                            graphicsContext.getPixelWriter().setColor((int) i, (int) j, BLUE);
-                        }
-                    } else {
-                        if (new_vector_M <= 0 && new_vector_N <= 0) {
-                            graphicsContext.getPixelWriter().setColor((int) i, (int) j, BLUE);
-                        }
+                    if (isFullCircle || isPointInSegment(op_x, op_y, oa_x, oa_y, ob_x, ob_y)) {
+                        graphicsContext.getPixelWriter().setColor((int) i, (int) j, color);
                     }
-
                 }
             }
+        }
+    }
+
+    private boolean isPointInSegment(double pointX, double pointY, double oa_x, double oa_y, double ob_x, double ob_y) {
+        double vector_M = oa_x * pointY - oa_y * pointX;
+        double vector_N = pointX * ob_y - pointY * ob_x;
+        double productOA_OB = oa_x * ob_y - oa_y * ob_x;
+        if (productOA_OB > 0) {
+            return vector_M >= 0 && vector_N >= 0;
+        } else if (productOA_OB < 0) {
+            return vector_M >= 0 || vector_N >= 0;
+        } else {
+            return false;
         }
     }
 }
