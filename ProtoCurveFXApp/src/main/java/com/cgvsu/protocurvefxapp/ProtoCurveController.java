@@ -37,13 +37,18 @@ public class ProtoCurveController {
         final Point2D clickPoint = new Point2D(event.getX(), event.getY());
         points.add(clickPoint);
         Point2D center = clickPoint;
-        Color color = Color.rgb(216, 191, 216);
-        drawSegment(graphicsContext, center.getX(), center.getY(), 100, 100, 45, color);
+        //Color.rgb(216, 191, 216)
+        Color color_center = Color.RED;
+        Color color_end = Color.BLUE;
+        drawSegment(graphicsContext, center.getX(), center.getY(), 100, 0, 360, color_center, color_end);
     }
 
-    private void drawSegment(GraphicsContext graphicsContext, double x, double y, double r, double startAngle, double arcAngle, Color color) {
+    private void drawSegment(GraphicsContext graphicsContext, double x, double y, double r, double startAngle, double arcAngle,
+                             Color color_center, Color color_end) {
+        startAngle = ((startAngle % 360) + 360) % 360;
+        arcAngle = arcAngle % 360;
         double endAngle = arcAngle + startAngle;
-        boolean isFullCircle = arcAngle >= 360 || startAngle == endAngle;
+        boolean isFullCircle = startAngle == endAngle;
 
         double oa_x = r * Math.cos(Math.toRadians(startAngle));
         double oa_y = r * Math.sin(Math.toRadians(startAngle));
@@ -58,10 +63,12 @@ public class ProtoCurveController {
             for (double j = top; j < top + box; j++) {
                 double op_x = i - x;
                 double op_y = j - y;
-
-                if (Math.pow((op_x), 2) + Math.pow((op_y), 2) <= Math.pow(r, 2)) {
+                double distance = Math.sqrt(Math.pow((op_x), 2) + Math.pow((op_y), 2));
+                if (distance <= r) {
                     if (isFullCircle || isPointInSegment(op_x, op_y, oa_x, oa_y, ob_x, ob_y)) {
-                        graphicsContext.getPixelWriter().setColor((int) i, (int) j, color);
+                        double ratio = distance / r;
+                        Color interpolatedColor = interpolate(color_center, color_end, ratio);
+                        graphicsContext.getPixelWriter().setColor((int) i, (int) j, interpolatedColor);
                     }
                 }
             }
@@ -79,6 +86,14 @@ public class ProtoCurveController {
         } else {
             return false;
         }
+    }
+
+    private Color interpolate(Color center, Color end, double ratio) {
+        double r = center.getRed() + (end.getRed() - center.getRed()) * ratio;
+        double g = center.getGreen() + (end.getGreen() - center.getGreen()) * ratio;
+        double b = center.getBlue() + (end.getBlue() - center.getBlue()) * ratio;
+
+        return new Color(r, g, b, 1.0);
     }
 }
 
