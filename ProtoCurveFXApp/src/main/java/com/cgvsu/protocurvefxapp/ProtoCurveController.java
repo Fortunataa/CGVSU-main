@@ -40,7 +40,12 @@ public class ProtoCurveController {
         //Color.rgb(216, 191, 216)
         Color color_center = Color.RED;
         Color color_end = Color.BLUE;
-        drawSegment(graphicsContext, center.getX(), center.getY(), 100, 0, 360, color_center, color_end);
+        //drawSegment(graphicsContext, center.getX(), center.getY(), 100, 0, 360, color_center, color_end);
+        drawSegment(graphicsContext, 100, 100, 80, 0, 90, Color.RED, Color.BLUE);
+        drawSegment(graphicsContext, 300, 100, 80, 90, 180, Color.GREEN, Color.YELLOW);
+        drawSegment(graphicsContext, 100, 300, 80, 180, 200, Color.ORANGE, Color.PURPLE);
+        drawSegment(graphicsContext, 500, 200, 100, 0, 360, Color.PINK, Color.DARKBLUE);
+        drawSegment(graphicsContext, 300, 300, 80, -45, 270, Color.CYAN, Color.MAGENTA);
     }
 
     private void drawSegment(GraphicsContext graphicsContext, double x, double y, double r, double startAngle, double arcAngle,
