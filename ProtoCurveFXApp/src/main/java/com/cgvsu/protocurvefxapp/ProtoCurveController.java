@@ -11,6 +11,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import javafx.scene.paint.Color;
 
+import static com.cgvsu.protocurvefxapp.DrawCircleSegment.drawSegment;
+
 
 public class ProtoCurveController {
 
@@ -34,71 +36,27 @@ public class ProtoCurveController {
     }
 
     private void handlePrimaryClick(GraphicsContext graphicsContext, MouseEvent event) {
+        /*
         final Point2D clickPoint = new Point2D(event.getX(), event.getY());
         points.add(clickPoint);
         Point2D center = clickPoint;
-        //Color.rgb(216, 191, 216)
+        Color.rgb(216, 191, 216)
         Color color_center = Color.RED;
         Color color_end = Color.BLUE;
+         */
         //drawSegment(graphicsContext, center.getX(), center.getY(), 100, 0, 360, color_center, color_end);
         drawSegment(graphicsContext, 100, 100, 80, 0, 90, Color.RED, Color.BLUE);
         drawSegment(graphicsContext, 300, 100, 80, 90, 180, Color.GREEN, Color.YELLOW);
         drawSegment(graphicsContext, 100, 300, 80, 180, 200, Color.ORANGE, Color.PURPLE);
         drawSegment(graphicsContext, 500, 200, 100, 0, 360, Color.PINK, Color.DARKBLUE);
         drawSegment(graphicsContext, 300, 300, 80, -45, 270, Color.CYAN, Color.MAGENTA);
-    }
+        drawSegment(graphicsContext, 600, 400, 120, 180, 45, Color.CYAN, Color.CYAN);
+        /*drawSegment(graphicsContext, 100, -2400, 2500, 0, 90, Color.BLACK, Color.WHITE);
+        drawSegment(graphicsContext, 100, 400, 50, 0+90, 90, Color.BLACK, Color.BLACK);
+        drawSegment(graphicsContext, 400, 200, 50, 0+90+90, 90, Color.BLACK, Color.BLACK);
+        drawSegment(graphicsContext, 400, 400, 50, 0+90+90+90, 90, Color.BLACK, Color.BLACK);
 
-    private void drawSegment(GraphicsContext graphicsContext, double x, double y, double r, double startAngle, double arcAngle,
-                             Color color_center, Color color_end) {
-        startAngle = ((startAngle % 360) + 360) % 360;
-        arcAngle = arcAngle % 360;
-        double endAngle = arcAngle + startAngle;
-        boolean isFullCircle = startAngle == endAngle;
-
-        double oa_x = r * Math.cos(Math.toRadians(startAngle));
-        double oa_y = r * Math.sin(Math.toRadians(startAngle));
-        double ob_x = r * Math.cos(Math.toRadians(endAngle));
-        double ob_y = r * Math.sin(Math.toRadians(endAngle));
-
-        double left = x - r;
-        double top = y - r;
-        double box = 2 * r;
-
-        for (double i = left; i < left + box; i++) {
-            for (double j = top; j < top + box; j++) {
-                double op_x = i - x;
-                double op_y = j - y;
-                double distance = Math.sqrt(Math.pow((op_x), 2) + Math.pow((op_y), 2));
-                if (distance <= r) {
-                    if (isFullCircle || isPointInSegment(op_x, op_y, oa_x, oa_y, ob_x, ob_y)) {
-                        double ratio = distance / r;
-                        Color interpolatedColor = interpolate(color_center, color_end, ratio);
-                        graphicsContext.getPixelWriter().setColor((int) i, (int) j, interpolatedColor);
-                    }
-                }
-            }
-        }
-    }
-
-    private boolean isPointInSegment(double pointX, double pointY, double oa_x, double oa_y, double ob_x, double ob_y) {
-        double vector_M = oa_x * pointY - oa_y * pointX;
-        double vector_N = pointX * ob_y - pointY * ob_x;
-        double productOA_OB = oa_x * ob_y - oa_y * ob_x;
-        if (productOA_OB > 0) {
-            return vector_M >= 0 && vector_N >= 0;
-        } else if (productOA_OB < 0) {
-            return vector_M >= 0 || vector_N >= 0;
-        } else {
-            return false;
-        }
-    }
-
-    private Color interpolate(Color center, Color end, double ratio) {
-        double r = center.getRed() + (end.getRed() - center.getRed()) * ratio;
-        double g = center.getGreen() + (end.getGreen() - center.getGreen()) * ratio;
-        double b = center.getBlue() + (end.getBlue() - center.getBlue()) * ratio;
-
-        return new Color(r, g, b, 1.0);
+         */
     }
 }
 
